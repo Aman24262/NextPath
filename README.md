@@ -21,3 +21,5 @@ NextPath is a full-stack SaaS application that leverages Artificial Intelligence
 1. **Clone the repository:**
    ```bash
    git clone [https://github.com/yourusername/nextpath.git](https://github.com/Aman24262/nextpath.git)
+
+   🌍 **Live Demo:** [Click here to use NextPath](https://next-path-ten.vercel.app)
