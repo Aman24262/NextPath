@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+/* Define your custom theme colors here in v4! */
+@theme {
+  --color-primary: #4F46E5;
+  --color-secondary: #10B981;
+  --color-dark: #0F172A;
+}
+
+/* Smooth scrolling and base styling */
+html {
+  scroll-behavior: smooth;
+}
+body {
+  background-color: #F8FAFC; 
+  color: #0F172A;
+}
