@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 1. Create a master Axios instance pointing to your Node.js backend
 const API = axios.create({
-    baseURL: 'http://localhost:5000/api', 
+    baseURL: 'https://nextpath-oro7.onrender.com/api', 
 });
 
 // 2. The "Interceptor" Magic

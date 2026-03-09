@@ -18,7 +18,7 @@ const Assessment = () => {
     const fetchQuestions = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/assessment/questions', {
+        const response = await axios.get('/api/assessment/questions', {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -78,7 +78,7 @@ const Assessment = () => {
       const token = localStorage.getItem('token');
       
       // Send the scores to your new AI Backend Route
-      const response = await axios.post('http://localhost:5000/api/recommendations/generate', 
+      const response = await axios.post('/api/recommendations/generate', 
         { traitScores }, 
         { headers: { Authorization: `Bearer ${token}` } }
       );

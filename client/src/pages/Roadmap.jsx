@@ -25,14 +25,14 @@ const Roadmap = () => {
         if (careerTitleFromState) {
           // Scenario 1: They clicked a specific career card. Ask AI to generate & save it.
           response = await axios.post(
-            'http://localhost:5000/api/roadmaps/generate',
+            '/api/roadmaps/generate',
             { careerTitle: careerTitleFromState },
             { headers: { Authorization: `Bearer ${token}` } }
           );
         } else {
           // Scenario 2: They clicked "View Current Roadmap". Fetch the saved one!
           response = await axios.get(
-            'http://localhost:5000/api/roadmaps/current',
+            '/api/roadmaps/current',
             { headers: { Authorization: `Bearer ${token}` } }
           );
         }
@@ -84,7 +84,7 @@ const Roadmap = () => {
     try {
         const token = localStorage.getItem('token');
         await axios.put(
-            `http://localhost:5000/api/roadmaps/${roadmap._id}/milestone/${milestoneId}`,
+            `/api/roadmaps/${roadmap._id}/milestone/${milestoneId}`,
             {},
             { headers: { Authorization: `Bearer ${token}` } }
         );

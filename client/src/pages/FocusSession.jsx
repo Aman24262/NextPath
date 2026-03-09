@@ -56,7 +56,7 @@ const FocusSession = () => {
     try {
       const token = localStorage.getItem('token');
       // We will reuse your existing stats route to boost their Focus Score!
-      await axios.put('http://localhost:5000/api/users/stats', {}, {
+      await axios.put('/api/users/stats', {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

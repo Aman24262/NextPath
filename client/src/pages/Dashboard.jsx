@@ -25,7 +25,7 @@ const Dashboard = () => {
     const fetchRoadmapStats = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/roadmaps/current', {
+        const response = await axios.get('/api/roadmaps/current', {
           headers: { Authorization: `Bearer ${token}` }
         });
 
