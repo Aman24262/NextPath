@@ -9,6 +9,12 @@ const PORT = process.env.PORT || 5000;
 
 app.use('/api/users', userRoutes);
 
+app.use(cors({
+  origin: ['https://next-path-ten.vercel.app', 'http://localhost:5173'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
 
 
 // Connect to the database first, THEN start the server
