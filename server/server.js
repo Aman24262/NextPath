@@ -6,28 +6,17 @@ const userRoutes = require('./src/routes/user.routes.js');
 
 const app = express();
 
-// 1. Middleware
+// Middleware FIRST
 app.use(express.json()); 
 app.use(cors({
-  origin: ['https://next-path-ten.vercel.app', 'http://localhost:5173'],
+  origin: ['https://next-path-ten.vercel.app', 'http://localhost:5173'], // We will use this Vercel link again
   credentials: true
 }));
 
-// 2. Diagnostic Log (The Truth-Finder)
-console.log("--- Server Route Check ---");
-console.log("Expecting path: /api/users/register");
+// Routes SECOND (Use /api/auth to match your React calls)
+app.use('/api/auth', userRoutes); 
 
-// 3. Routes
-app.use('/api/auth', userRoutes);
-
-// 4. Catch-all for 404s (This will tell us EXACTLY what URL failed)
-app.use((req, res) => {
-    console.log(`❌ 404 Attempted on: ${req.originalUrl}`);
-    res.status(404).json({ message: `Route ${req.originalUrl} not found on this server.` });
-});
-
-// 5. Server Start
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
-    app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+    app.listen(PORT, () => console.log(`✅ Backend Live on ${PORT}`));
 });
