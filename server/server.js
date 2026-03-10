@@ -7,23 +7,27 @@ const userRoutes = require('./src/routes/user.routes.js');
 const app = express();
 
 // 1. Middleware
-app.use(express.json()); // This is crucial so your server can read the email/password you send!
+app.use(express.json()); 
 app.use(cors({
   origin: ['https://next-path-ten.vercel.app', 'http://localhost:5173'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
 
-// 2. Routes
+// 2. Diagnostic Log (The Truth-Finder)
+console.log("--- Server Route Check ---");
+console.log("Expecting path: /api/users/register");
+
+// 3. Routes
 app.use('/api/users', userRoutes);
 
-// 3. Database & Server Start
-const PORT = process.env.PORT || 5000;
+// 4. Catch-all for 404s (This will tell us EXACTLY what URL failed)
+app.use((req, res) => {
+    console.log(`❌ 404 Attempted on: ${req.originalUrl}`);
+    res.status(404).json({ message: `Route ${req.originalUrl} not found on this server.` });
+});
 
+// 5. Server Start
+const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`✅ Server is successfully running on port ${PORT}`);
-    });
-}).catch(err => {
-    console.error("❌ Database connection failed:", err);
+    app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
 });
