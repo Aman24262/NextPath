@@ -16,7 +16,7 @@ app.use(cors({
 // 2. Diagnostic Log (The Truth-Finder)
 console.log("--- Server Route Check ---");
 console.log("Expecting path: /api/users/register");
-git add .
+
 // 3. Routes
 app.use('/api/auth', userRoutes);
 
