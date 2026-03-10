@@ -9,7 +9,7 @@ const app = express();
 // Middleware FIRST
 app.use(express.json()); 
 app.use(cors({
-  origin: ['https://next-path-ten.vercel.app', 'http://localhost:5173'], // We will use this Vercel link again
+  origin: ['https://next-path-henna.vercel.app', 'http://localhost:5173'], // We will use this Vercel link again
   credentials: true
 }));
 
