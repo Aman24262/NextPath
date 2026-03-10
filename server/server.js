@@ -16,9 +16,9 @@ app.use(cors({
 // 2. Diagnostic Log (The Truth-Finder)
 console.log("--- Server Route Check ---");
 console.log("Expecting path: /api/users/register");
-
+git add .
 // 3. Routes
-app.use('/api/users', userRoutes);
+app.use('/api/auth', userRoutes);
 
 // 4. Catch-all for 404s (This will tell us EXACTLY what URL failed)
 app.use((req, res) => {
