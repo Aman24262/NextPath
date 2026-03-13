@@ -29,7 +29,7 @@ passport.use(
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             // Inside your new GoogleStrategy block:
-            callbackURL: "http://localhost:5000/api/auth/google/callback", // Must match your Google Cloud Console
+            callbackURL: "https://nextpath-vv0x.onrender.com/api/auth/google/callback", // Must match your Google Cloud Console
             passReqToCallback: true
         },
         async (req, accessToken, refreshToken, profile, done) => {
