@@ -11,6 +11,7 @@ import PrivateRoute from './components/layout/PrivateRoute.jsx';
 // 3. Public Pages
 import Login from './pages/public/Login';
 import Register from './pages/public/Register';
+import OAuthCallback from './pages/public/OAuthCallback'; // <-- NEW: Import OAuth Callback
 
 // 4. Protected Pages
 // Note: Adjust this import path if your Dashboard is in a different folder!
@@ -45,6 +46,7 @@ function App() {
             {/* 🔓 Public Routes (Anyone can access) */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/oauth-callback" element={<OAuthCallback />} />
 
             {/* 🔒 Protected Routes (Locked behind the Bouncer) */}
             <Route 

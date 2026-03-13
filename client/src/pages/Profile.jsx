@@ -18,8 +18,10 @@ import {
 const Profile = () => {
   const { user, setUser } = useContext(AuthContext);
   
-  // 1. Form State (Now includes 'avatar')
+  // 1. Form State (Now includes 'avatar', 'name', 'password')
   const [formData, setFormData] = useState({
+    name: '',
+    password: '',
     avatar: '',
     educationLevel: 'Undergraduate',
     stream: '',
@@ -44,6 +46,8 @@ const Profile = () => {
         if (response.data.profile) {
           const { avatar, educationLevel, stream, skills, goals } = response.data.profile;
           setFormData({
+            name: response.data.name || '',
+            password: '', // Never populate password for security
             avatar: avatar || '',
             educationLevel: educationLevel || 'Undergraduate',
             stream: stream || '',
@@ -109,6 +113,11 @@ const Profile = () => {
         skills: skillsArray
       };
 
+      // Don't send empty password strings
+      if (!dataToSend.password) {
+        delete dataToSend.password;
+      }
+
       const response = await axios.put('/api/users/profile', dataToSend, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -119,6 +128,7 @@ const Profile = () => {
         if (setUser) {
           setUser((prevUser) => ({
             ...prevUser,
+            name: response.data.name,
             profile: response.data.profile
           }));
         }
@@ -190,6 +200,40 @@ const Profile = () => {
             <div>
               <h3 className="text-lg font-bold text-slate-900">Profile Picture</h3>
               <p className="text-sm text-slate-500 mt-1">Click the camera icon to upload.<br/>Square images under 2MB work best.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Name */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                <User className="w-4 h-4 text-slate-400" />
+                Full Name
+              </label>
+              <input 
+                type="text" 
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Your Full Name"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all bg-slate-50 hover:bg-white"
+              />
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                <Zap className="w-4 h-4 text-slate-400" />
+                Password
+              </label>
+              <input 
+                type="password" 
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Leave blank to keep unchanged"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all bg-slate-50 hover:bg-white"
+              />
             </div>
           </div>
 

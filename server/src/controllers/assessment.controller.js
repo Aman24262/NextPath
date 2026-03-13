@@ -1,54 +1,46 @@
 const Groq = require('groq-sdk');
-// NOTE: Make sure this path matches where your Question model is saved!
 const Question = require('../models/question.model'); 
 
 // @desc    Get all questions for the assessment
-// @route   GET /api/assessment/questions
 exports.getQuestions = async (req, res) => {
     try {
-        const questions = await Question.find();
+        // First, try to get from DB
+        let questions = await Question.find();
+
+        // FALLBACK: If DB is empty, send these immediately so the UI doesn't crash
+        if (!questions || questions.length === 0) {
+            questions = [
+                { _id: "q1", text: "I enjoy solving complex logical puzzles.", category: "Analytical" },
+                { _id: "q2", text: "I prefer working in a creative environment.", category: "Creative" },
+                { _id: "q3", text: "I am comfortable leading a team of people.", category: "Management" },
+                { _id: "q4", text: "I like helping others solve their problems.", category: "Social" },
+                { _id: "q5", text: "I enjoy building or fixing things with my hands.", category: "Technical" }
+            ];
+        }
+
         res.status(200).json({ success: true, data: questions });
     } catch (error) {
-        console.error(error);
+        console.error("Fetch Error:", error);
         res.status(500).json({ message: 'Error fetching questions' });
     }
 };
 
-// @desc    Create a new question (Admin)
-// @route   POST /api/assessment/questions
-exports.createQuestion = async (req, res) => {
-    try {
-        const question = await Question.create(req.body);
-        res.status(201).json({ success: true, data: question });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error creating question' });
-    }
-};
-
-// @desc    Analyze user answers and return Top 3 Career Matches (GROQ POWERED!)
-// @route   POST /api/assessment/analyze
+// @desc    Analyze user answers using AI (GROQ)
 exports.analyzeAssessment = async (req, res) => {
     try {
-        const { answers } = req.body;
+        const { traitScores } = req.body; // Matches your Assessment.jsx submit logic
 
-        if (!answers) {
-            return res.status(400).json({ message: 'Assessment answers are required.' });
+        if (!traitScores) {
+            return res.status(400).json({ message: 'Trait scores are required.' });
         }
 
         const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
         const prompt = `
-        You are an expert career counselor. Analyze these user assessment answers: ${JSON.stringify(answers)}.
-        Based on their skills and preferences, suggest the top 3 best career matches.
-        
-        You MUST return ONLY a raw JSON array of 3 objects. Do not use markdown blocks or introductory text.
-        Each object must have exactly these keys:
-        "title" (string: the career name),
-        "matchPercentage" (number: 85 to 99),
-        "difficulty" (string: Beginner, Intermediate, or Advanced),
-        "estimatedLearningTime" (string: e.g., "1-2 Years"),
-        "reason" (string: a 2-sentence explanation of why this fits their answers).
+        User Trait Scores: ${JSON.stringify(traitScores)}.
+        Based on these scores in Analytical, Creative, Social, Technical, and Management, suggest the top 3 best career matches.
+        Return ONLY a raw JSON array. 
+        Keys: "title", "matchPercentage" (85-99), "difficulty", "estimatedLearningTime", "reason".
         `;
 
         const chatCompletion = await groq.chat.completions.create({
@@ -61,10 +53,7 @@ exports.analyzeAssessment = async (req, res) => {
         const cleanJsonString = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
         const careersData = JSON.parse(cleanJsonString);
 
-        res.status(200).json({
-            success: true,
-            data: careersData
-        });
+        res.status(200).json({ success: true, data: careersData });
 
     } catch (error) {
         console.error('❌ Groq AI Error:', error);
@@ -72,7 +61,12 @@ exports.analyzeAssessment = async (req, res) => {
     }
 };
 
-// @desc    Dummy route just in case your router needs it
+// @desc    Create a new question
+exports.createQuestion = async (req, res) => {
+    res.status(501).json({ message: 'Not Implemented' });
+};
+
+// @desc    Get current assessment
 exports.getAssessment = async (req, res) => {
-    res.status(200).json({ success: true, message: "Assessment route active." });
+    res.status(501).json({ message: 'Not Implemented' });
 };

@@ -20,9 +20,14 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required: [true, 'Please provide a password'],
+            // NOT required, because Google OAuth users won't have a password!
             minlength: 6,
             select: false 
+        },
+        googleId: {
+            type: String,
+            unique: true,
+            sparse: true // Allows multiple null/undefined googleIds for regular users
         },
         role: {
             type: String,
@@ -36,6 +41,10 @@ const userSchema = new mongoose.Schema(
             focusScore: { type: Number, default: 0 }
         },
         isEmailVerified: {
+            type: Boolean,
+            default: false
+        },
+        assessmentReminderSent: {
             type: Boolean,
             default: false
         },
@@ -67,15 +76,15 @@ const userSchema = new mongoose.Schema(
 );
 
 // This runs automatically BEFORE saving a user to the database
-userSchema.pre('save', async function (next) {  // <-- ADD 'next' HERE
-    if (!this.isModified('password')) {
-        return next();
+userSchema.pre('save', async function () {
+
+    // If password doesn't exist OR wasn't modified, skip hashing
+    if (!this.password || !this.isModified('password')) {
+        return;
     }
-    
-    // Keep whatever password hashing logic you already have here!
+
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-    next(); // Make sure next() is called at the end too
 });
 
 // Method to compare entered password with hashed password

@@ -1,31 +1,24 @@
 const express = require('express');
-const { protect } = require('../middlewares/auth.middleware'); // Import our security guard
-
-// FIXED: Combine all controller functions into one require statement!
-
-
-const { 
-    updateProfile, 
-    getProfile, 
-    getDashboardStats,
-    updateStats, // <-- Add this new one!
-    getAllUsers,
-} = require('../controllers/user.controller');
-
 const router = express.Router();
+const userController = require('../controllers/user.controller');
+const assessmentController = require('../controllers/assessment.controller'); // Added this!
 
-// Apply the 'protect' middleware to these routes
-// This means a user MUST pass a valid JWT token to access them
-router.route('/profile')
-    .get(protect, getProfile)
-    .put(protect, updateProfile);
+const { protect } = require('../middlewares/auth.middleware');
 
-router.get('/dashboard', protect, getDashboardStats);
+// Authentication Routes
+router.post('/register', userController.registerUser);
+router.post('/login', userController.loginUser);
 
-// Route to update statistics
-router.put('/stats', protect, updateStats);
+// Profile & Dashboard Routes
+router.get('/profile', protect, userController.getProfile);
+router.put('/profile', protect, userController.updateProfile);
+router.get('/dashboard', protect, userController.getDashboardStats);
+router.put('/stats', protect, userController.updateStats);
+router.get('/', protect, userController.getAllUsers);
 
-// Admin Route to view all users
-router.get('/', protect, getAllUsers);
+// Assessment Routes (Matches Assessment.jsx calls)
+// This ensures /api/assessment/questions works
+router.get('/assessment/questions', assessmentController.getQuestions);
+router.post('/recommendations/generate', assessmentController.analyzeAssessment);
 
 module.exports = router;

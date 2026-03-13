@@ -1,4 +1,6 @@
 const User = require('../models/user.model');
+const generateToken = require('../utils/generateToken');
+const sendEmail = require('../utils/sendEmail');
 
 // @desc    Get current logged-in user profile
 // @route   GET /api/users/profile
@@ -34,27 +36,32 @@ exports.updateProfile = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // 1. Update the profile fields including the avatar image
+    // 1. Update regular fields (Name & Password)
+        if (req.body.name) {
+            user.name = req.body.name;
+        }
+        
+        // If a new password is provided, set it. Our userSchema.pre('save') 
+        // will automatically detect the modification and hash the new password.
+        if (req.body.password && req.body.password.trim() !== '') {
+            user.password = req.body.password;
+        }
+
+        // 2. Update the profile fields including the avatar image
         user.profile.avatar = req.body.avatar || user.profile.avatar;
         user.profile.educationLevel = req.body.educationLevel || user.profile.educationLevel;
         user.profile.stream = req.body.stream || user.profile.stream;
         user.profile.skills = req.body.skills || user.profile.skills;
         user.profile.goals = req.body.goals || user.profile.goals;
 
-        // 2. THE FIX: Use updateOne to bypass the pre('save') hook!
-        await User.updateOne(
-            { _id: req.user.id },
-            { $set: { profile: user.profile } }
-        );
-
-        // 3. Fetch the freshly updated user to send back to React
-        const updatedUser = await User.findById(req.user.id);
+        // 3. THE FIX: Use save() instead of updateOne to run pre-save hooks (like password hashing)
+        await user.save();
 
         res.json({
-            _id: updatedUser._id,
-            name: updatedUser.name,
-            email: updatedUser.email,
-            profile: updatedUser.profile
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            profile: user.profile
         });
         
     } catch (error) {
@@ -144,5 +151,95 @@ exports.getAllUsers = async (req, res) => {
     } catch (error) {
         console.error('Error fetching all users:', error);
         res.status(500).json({ message: 'Server Error fetching users' });
+    }
+};
+
+exports.registerUser = async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+        
+        if (!name || !email || !password) {
+            return res.status(400).json({ message: "Please provide all fields" });
+        }
+
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            return res.status(400).json({ message: "User already exists with this email" });
+        }
+
+        const user = await User.create({ name, email, password });
+
+        if (user) {
+            // Send Welcome Email
+            try {
+                await sendEmail({
+                    email: user.email,
+                    subject: 'Welcome to NextPath! 🚀',
+                    message: `
+                        <h1>Welcome to NextPath, ${user.name}!</h1>
+                        <p>We're thrilled to have you on board. NextPath is your personal guide to building a successful career path.</p>
+                        <p>To get started, please log in and complete your initial assessment so we can personalize your experience!</p>
+                        <br/>
+                        <p>Best Regards,</p>
+                        <p>The NextPath Team</p>
+                    `
+                });
+            } catch (emailError) {
+                console.error("Welcome email failed to send:", emailError);
+                // We don't fail the registration if the email fails
+            }
+
+            res.status(201).json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                profile: user.profile,
+                token: generateToken(user._id)
+            });
+        } else {
+            res.status(400).json({ message: "Invalid user data received" });
+        }
+    } catch (error) {
+        console.error("Registration error:", error);
+        res.status(500).json({ message: "Server error during registration" });
+    }
+};
+
+exports.loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: "Please provide email and password" });
+        }
+
+        // Find user by email and include password field (select: false in schema)
+        const user = await User.findOne({ email }).select('+password');
+
+        if (!user || !user.password) {
+            return res.status(401).json({ message: "Invalid email or password" });
+        }
+
+        const isMatch = await user.matchPassword(password);
+
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid email or password" });
+        }
+
+        // Make sure to remove password from the response object explicitly
+        user.password = undefined;
+
+        res.status(200).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            profile: user.profile,
+            token: generateToken(user._id)
+        });
+    } catch (error) {
+        console.error("Login Error:", error);
+        res.status(500).json({ message: "Server error during login" });
     }
 };
