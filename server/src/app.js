@@ -7,6 +7,7 @@ const notificationRoutes = require('./routes/notification.routes');
 
 
 
+
 // 1. Import All Routes
 const userRoutes = require('./routes/user.routes');
 const assessmentRoutes = require('./routes/assessment.routes');
@@ -19,12 +20,12 @@ const app = express();
 
 // 3. Global Middlewares
 
+const corsOptions = require('./config/corsOptions');
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
-app.use(cors({
-  origin: 'http://localhost:5173', // Your local Vite port
-  credentials: true
-})); 
+
+app.use(cors(corsOptions));
 
 // 4. Mount Routes
 app.use('/api/users', userRoutes);
