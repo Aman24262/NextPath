@@ -7,11 +7,11 @@ import { AuthProvider } from './context/AuthContext';
 // 2. Layout & Protection Components
 import Navbar from './components/layout/Navbar';
 import PrivateRoute from './components/layout/PrivateRoute.jsx';
+import PublicRoute from './components/layout/PublicRoute.jsx'; // <-- NEW: Import the PublicRoute wrapper
 
 // 3. Public Pages
 import Login from './pages/public/Login';
 import Register from './pages/public/Register';
-import OAuthCallback from './pages/public/OAuthCallback'; // <-- NEW: Import OAuth Callback
 
 // 4. Protected Pages
 // Note: Adjust this import path if your Dashboard is in a different folder!
@@ -43,10 +43,23 @@ function App() {
         
         <main className="min-h-[calc(100vh-64px)] bg-slate-50">
           <Routes>
-            {/* 🔓 Public Routes (Anyone can access) */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/oauth-callback" element={<OAuthCallback />} />
+            {/* 🔓 Public Routes (Protected from logged-in users) */}
+            <Route 
+              path="/login" 
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              } 
+            />
+            <Route 
+              path="/register" 
+              element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              } 
+            />
 
             {/* 🔒 Protected Routes (Locked behind the Bouncer) */}
             <Route 

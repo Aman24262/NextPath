@@ -228,15 +228,16 @@ exports.loginUser = async (req, res) => {
         }
 
         // Make sure to remove password from the response object explicitly
-        user.password = undefined;
+        const userObj = user.toObject();
+        delete userObj.password;
 
         res.status(200).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            profile: user.profile,
-            token: generateToken(user._id)
+            _id: userObj._id,
+            name: userObj.name,
+            email: userObj.email,
+            role: userObj.role,
+            profile: userObj.profile,
+            token: generateToken(userObj._id)
         });
     } catch (error) {
         console.error("Login Error:", error);

@@ -20,14 +20,9 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            // NOT required, because Google OAuth users won't have a password!
+            // Required for standard email login
             minlength: 6,
             select: false 
-        },
-        googleId: {
-            type: String,
-            unique: true,
-            sparse: true // Allows multiple null/undefined googleIds for regular users
         },
         role: {
             type: String,

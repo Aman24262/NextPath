@@ -119,6 +119,20 @@ const Dashboard = () => {
                 </motion.div>
               ))}
             </div>
+          ) : activeRoadmap ? (
+            <div className="bg-indigo-50 border-2 border-dashed border-indigo-200 rounded-2xl p-8 text-center">
+              <BrainCircuit className="w-12 h-12 text-indigo-400 mx-auto mb-4" />
+              <h3 className="text-lg font-bold text-indigo-900 mb-2">Explore New Career Paths</h3>
+              <p className="text-indigo-600/80 mb-6 max-w-md mx-auto">
+                Want to switch gears? Retake the AI assessment to generate completely new career options.
+              </p>
+              <button 
+                onClick={() => navigate('/assessment')}
+                className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-colors shadow-sm"
+              >
+                Generate New Career Options
+              </button>
+            </div>
           ) : (
             // If they haven't taken the test yet, or just logged in normally
             <div className="bg-indigo-50 border-2 border-dashed border-indigo-200 rounded-2xl p-8 text-center">
