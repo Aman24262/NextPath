@@ -1,9 +1,9 @@
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://your-frontend-domain.vercel.app"
+    "https://next-path-mu.vercel.app"
   ],
   credentials: true
-}
+};
 
-module.exports = corsOptions
+module.exports = corsOptions;
